@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="EmployeeDataModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Department">
+          <Key>
+            <PropertyRef Name="DepartmentNumber" />
+          </Key>
+          <Property Name="DepartmentNumber" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Employee">
+          <Key>
+            <PropertyRef Name="EmployeeID" />
+          </Key>
+          <Property Name="EmployeeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EmployeeNumber" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="DepartmentNumber" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="JobTitle" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="HireDate" Type="date" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Employee_Department_DepartmentNumber">
+          <End Role="Department" Type="Self.Department" Multiplicity="1" />
+          <End Role="Employee" Type="Self.Employee" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Department">
+              <PropertyRef Name="DepartmentNumber" />
+            </Principal>
+            <Dependent Role="Employee">
+              <PropertyRef Name="DepartmentNumber" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="USP_Employee_D00" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="I_INT_EmployeeID" Type="int" Mode="In" />
+          <Parameter Name="I_CHR_EmployeeNumber" Type="varchar" Mode="In" />
+          <Parameter Name="I_CHR_Name" Type="nvarchar" Mode="In" />
+          <Parameter Name="I_CHR_DepartmentNumber" Type="varchar" Mode="In" />
+          <Parameter Name="I_CHR_JobTitle" Type="nvarchar" Mode="In" />
+          <Parameter Name="I_DTE_HireDate" Type="date" Mode="In" />
+        </Function>
+        <Function Name="USP_Employee_I00" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="I_CHR_EmployeeNumber" Type="varchar" Mode="In" />
+          <Parameter Name="I_CHR_Name" Type="nvarchar" Mode="In" />
+          <Parameter Name="I_CHR_DepartmentNumber" Type="varchar" Mode="In" />
+          <Parameter Name="I_CHR_JobTitle" Type="nvarchar" Mode="In" />
+          <Parameter Name="I_DTE_HireDate" Type="date" Mode="In" />
+        </Function>
+        <Function Name="USP_Employee_S00" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="USP_Employee_U00" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="I_INT_EmployeeID" Type="int" Mode="In" />
+          <Parameter Name="I_CHR_EmployeeNumber" Type="varchar" Mode="In" />
+          <Parameter Name="I_CHR_Name" Type="nvarchar" Mode="In" />
+          <Parameter Name="I_CHR_DepartmentNumber" Type="varchar" Mode="In" />
+          <Parameter Name="I_CHR_JobTitle" Type="nvarchar" Mode="In" />
+          <Parameter Name="I_DTE_HireDate" Type="date" Mode="In" />
+        </Function>
+        <EntityContainer Name="EmployeeDataModelStoreContainer">
+          <EntitySet Name="Department" EntityType="Self.Department" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Employee" EntityType="Self.Employee" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Employee_Department_DepartmentNumber" Association="Self.FK_Employee_Department_DepartmentNumber">
+            <End Role="Department" EntitySet="Department" />
+            <End Role="Employee" EntitySet="Employee" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="EmployeeDataModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Department">
+          <Key>
+            <PropertyRef Name="DepartmentNumber" />
+          </Key>
+          <Property Name="DepartmentNumber" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Employee" Relationship="Self.FK_Employee_Department_DepartmentNumber" FromRole="Department" ToRole="Employee" />
+        </EntityType>
+        <EntityType Name="Employee">
+          <Key>
+            <PropertyRef Name="EmployeeID" />
+          </Key>
+          <Property Name="EmployeeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EmployeeNumber" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="DepartmentNumber" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="JobTitle" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="HireDate" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="Department" Relationship="Self.FK_Employee_Department_DepartmentNumber" FromRole="Employee" ToRole="Department" />
+        </EntityType>
+        <Association Name="FK_Employee_Department_DepartmentNumber">
+          <End Role="Department" Type="Self.Department" Multiplicity="1" />
+          <End Role="Employee" Type="Self.Employee" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Department">
+              <PropertyRef Name="DepartmentNumber" />
+            </Principal>
+            <Dependent Role="Employee">
+              <PropertyRef Name="DepartmentNumber" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="EmployeeDataEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Department" EntityType="Self.Department" />
+          <EntitySet Name="Employee" EntityType="Self.Employee" />
+          <AssociationSet Name="FK_Employee_Department_DepartmentNumber" Association="Self.FK_Employee_Department_DepartmentNumber">
+            <End Role="Department" EntitySet="Department" />
+            <End Role="Employee" EntitySet="Employee" />
+          </AssociationSet>
+          <FunctionImport Name="USP_Employee_D00">
+            <Parameter Name="I_INT_EmployeeID" Mode="In" Type="Int32" />
+            <Parameter Name="I_CHR_EmployeeNumber" Mode="In" Type="String" />
+            <Parameter Name="I_CHR_Name" Mode="In" Type="String" />
+            <Parameter Name="I_CHR_DepartmentNumber" Mode="In" Type="String" />
+            <Parameter Name="I_CHR_JobTitle" Mode="In" Type="String" />
+            <Parameter Name="I_DTE_HireDate" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="USP_Employee_I00">
+            <Parameter Name="I_CHR_EmployeeNumber" Mode="In" Type="String" />
+            <Parameter Name="I_CHR_Name" Mode="In" Type="String" />
+            <Parameter Name="I_CHR_DepartmentNumber" Mode="In" Type="String" />
+            <Parameter Name="I_CHR_JobTitle" Mode="In" Type="String" />
+            <Parameter Name="I_DTE_HireDate" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="USP_Employee_S00" ReturnType="Collection(EmployeeDataModel.USP_Employee_S00_Result)" />
+          <FunctionImport Name="USP_Employee_U00">
+            <Parameter Name="I_INT_EmployeeID" Mode="In" Type="Int32" />
+            <Parameter Name="I_CHR_EmployeeNumber" Mode="In" Type="String" />
+            <Parameter Name="I_CHR_Name" Mode="In" Type="String" />
+            <Parameter Name="I_CHR_DepartmentNumber" Mode="In" Type="String" />
+            <Parameter Name="I_CHR_JobTitle" Mode="In" Type="String" />
+            <Parameter Name="I_DTE_HireDate" Mode="In" Type="DateTime" />
+          </FunctionImport>
+        </EntityContainer>
+        <ComplexType Name="USP_Employee_S00_Result">
+          <Property Type="Int32" Name="EmployeeID" Nullable="false" />
+          <Property Type="String" Name="EmployeeNumber" Nullable="false" MaxLength="10" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="50" />
+          <Property Type="String" Name="Department" Nullable="false" MaxLength="50" />
+          <Property Type="String" Name="JobTitle" Nullable="false" MaxLength="50" />
+          <Property Type="DateTime" Name="HireDate" Nullable="false" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="EmployeeDataModelStoreContainer" CdmEntityContainer="EmployeeDataEntities">
+          <EntitySetMapping Name="Department">
+            <EntityTypeMapping TypeName="EmployeeDataModel.Department">
+              <MappingFragment StoreEntitySet="Department">
+                <ScalarProperty Name="DepartmentNumber" ColumnName="DepartmentNumber" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Employee">
+            <EntityTypeMapping TypeName="EmployeeDataModel.Employee">
+              <MappingFragment StoreEntitySet="Employee">
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="EmployeeNumber" ColumnName="EmployeeNumber" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="DepartmentNumber" ColumnName="DepartmentNumber" />
+                <ScalarProperty Name="JobTitle" ColumnName="JobTitle" />
+                <ScalarProperty Name="HireDate" ColumnName="HireDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="USP_Employee_D00" FunctionName="EmployeeDataModel.Store.USP_Employee_D00" />
+          <FunctionImportMapping FunctionImportName="USP_Employee_I00" FunctionName="EmployeeDataModel.Store.USP_Employee_I00" />
+          <FunctionImportMapping FunctionImportName="USP_Employee_S00" FunctionName="EmployeeDataModel.Store.USP_Employee_S00">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EmployeeDataModel.USP_Employee_S00_Result">
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="EmployeeNumber" ColumnName="EmployeeNumber" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Department" ColumnName="Department" />
+                <ScalarProperty Name="JobTitle" ColumnName="JobTitle" />
+                <ScalarProperty Name="HireDate" ColumnName="HireDate" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="USP_Employee_U00" FunctionName="EmployeeDataModel.Store.USP_Employee_U00" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="無" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
