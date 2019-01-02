@@ -1,3 +1,16 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 $(document).ready(initialize);
 function initialize() {
     var model = new EmployeeViewModel();
@@ -21,18 +34,15 @@ var Department = /** @class */ (function () {
     }
     return Department;
 }());
-var TempEmployee = /** @class */ (function () {
+var TempEmployee = /** @class */ (function (_super) {
+    __extends(TempEmployee, _super);
     function TempEmployee() {
-        this.status = TempEmployeeStatus.modify;
-        this.employeeID = null;
-        this.employeeNumber = '';
-        this.name = '';
-        this.department = '';
-        this.jobTitle = '';
-        this.hireDate = '';
+        var _this = _super.call(this, null, '', '', '', '', '') || this;
+        _this.status = TempEmployeeStatus.modify;
+        return _this;
     }
     return TempEmployee;
-}());
+}(Employee));
 var TempEmployeeStatus;
 (function (TempEmployeeStatus) {
     TempEmployeeStatus[TempEmployeeStatus["modify"] = 0] = "modify";
@@ -172,7 +182,7 @@ var EmployeeController = /** @class */ (function () {
         };
         $.ajax({
             type: 'POST',
-            url: '../Home/Data',
+            url: '../Employee/SearchEmployees',
             data: data,
             dataType: 'json'
         }).done(function (employees) {
@@ -197,7 +207,7 @@ var EmployeeController = /** @class */ (function () {
         this.model.departments.length = 0;
         $.ajax({
             type: 'POST',
-            url: '../Home/Department',
+            url: '../Employee/GetAllDepartments',
             dataType: 'json'
         }).done(function (departments) {
             if (departments) {
@@ -224,7 +234,7 @@ var EmployeeController = /** @class */ (function () {
         this.model.departments.length = 0;
         $.ajax({
             type: 'POST',
-            url: '../Home/Department',
+            url: '../Employee/GetAllDepartments',
             dataType: 'json'
         }).done(function (departments) {
             if (departments) {
@@ -251,29 +261,38 @@ var EmployeeController = /** @class */ (function () {
         });
     };
     EmployeeController.prototype.saveTable = function () {
+        var _this = this;
         if (!$('form').valid()) {
             return;
         }
         var changedEmployeeData = this.sortTempEmployeeData();
         console.log(changedEmployeeData);
         this.clearEmployeeData();
-        //TODO: 驗證、送出資料、取回資料至Employee
+        //TODO: 送出資料、取回資料至Employee
         $.ajax({
             type: 'POST',
-            url: '../Home/ChangeData',
+            url: '../Employee/ChangeData',
             data: changedEmployeeData,
             dataType: 'json'
+        }).done(function (employees) {
+            if (employees) {
+                for (var _i = 0, employees_2 = employees; _i < employees_2.length; _i++) {
+                    var employee = employees_2[_i];
+                    var temp = new Employee(employee.EmployeeID, employee.EmployeeNumber, employee.Name, employee.Department, employee.JobTitle, employee.HireDate);
+                    _this.model.employees.push(temp);
+                }
+            }
+            _this.model.searchText = '';
+            _this.model.tableStatus = TableStatus.onlyDisplay;
+            _this.model.btnSearchStatus = BtnStatus.display;
+            if (_this.model.employees.length) {
+                _this.model.btnModifyStatus = BtnStatus.display;
+            }
+            _this.model.btnSaveStatus = BtnStatus.hidden;
+            _this.model.btnCancelStatus = BtnStatus.hidden;
+            _this.clearTempTable();
+            _this.view.updateView();
         });
-        //this.model.employees = [...changedEmployeeData.insert, ...changedEmployeeData.update];
-        this.model.tableStatus = TableStatus.onlyDisplay;
-        this.model.btnSearchStatus = BtnStatus.display;
-        if (this.model.employees.length) {
-            this.model.btnModifyStatus = BtnStatus.display;
-        }
-        this.model.btnSaveStatus = BtnStatus.hidden;
-        this.model.btnCancelStatus = BtnStatus.hidden;
-        this.clearTempTable();
-        this.view.updateView();
     };
     EmployeeController.prototype.cancelChanges = function () {
         this.model.tableStatus = TableStatus.onlyDisplay;

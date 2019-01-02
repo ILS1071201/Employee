@@ -32,23 +32,12 @@ class Department {
     }
 }
 
-class TempEmployee {
+class TempEmployee extends Employee {
     status: TempEmployeeStatus;
-    employeeID: number | null;
-    employeeNumber: string;
-    name: string;
-    department: string;
-    jobTitle: string;
-    hireDate: string;
 
     constructor() {
+        super(null, '', '', '', '', '');
         this.status = TempEmployeeStatus.modify;
-        this.employeeID = null;
-        this.employeeNumber = '';
-        this.name = '';
-        this.department = '';
-        this.jobTitle = '';
-        this.hireDate = '';
     }
 }
 
@@ -257,7 +246,7 @@ class EmployeeController {
 
         $.ajax({
             type: 'POST',
-            url: '../Home/Data',
+            url: '../Employee/SearchEmployees',
             data: data,
             dataType: 'json'
         }).done((employees) => {
@@ -290,7 +279,7 @@ class EmployeeController {
         this.model.departments.length = 0;
         $.ajax({
             type: 'POST',
-            url: '../Home/Department',
+            url: '../Employee/GetAllDepartments',
             dataType: 'json'
         }).done((departments) => {
             if (departments) {
@@ -321,7 +310,7 @@ class EmployeeController {
         this.model.departments.length = 0;
         $.ajax({
             type: 'POST',
-            url: '../Home/Department',
+            url: '../Employee/GetAllDepartments',
             dataType: 'json'
         }).done((departments) => {
             if (departments) {
@@ -362,26 +351,40 @@ class EmployeeController {
         console.log(changedEmployeeData);
 
         this.clearEmployeeData();
-        //TODO: 驗證、送出資料、取回資料至Employee
+        //TODO: 送出資料、取回資料至Employee
 
         $.ajax({
             type: 'POST',
-            url: '../Home/ChangeData',
+            url: '../Employee/ChangeData',
             data: changedEmployeeData,
             dataType: 'json'
+        }).done((employees) => {
+            if (employees) {
+                for (const employee of employees) {
+                    let temp = new Employee(
+                        employee.EmployeeID,
+                        employee.EmployeeNumber,
+                        employee.Name,
+                        employee.Department,
+                        employee.JobTitle,
+                        employee.HireDate)
+
+                    this.model.employees.push(temp);
+                }
+            }
+
+            this.model.searchText = '';
+            this.model.tableStatus = TableStatus.onlyDisplay;
+            this.model.btnSearchStatus = BtnStatus.display;
+            if (this.model.employees.length) {
+                this.model.btnModifyStatus = BtnStatus.display;
+            }
+            this.model.btnSaveStatus = BtnStatus.hidden;
+            this.model.btnCancelStatus = BtnStatus.hidden;
+            this.clearTempTable();
+            this.view.updateView();
         });
 
-        //this.model.employees = [...changedEmployeeData.insert, ...changedEmployeeData.update];
-
-        this.model.tableStatus = TableStatus.onlyDisplay;
-        this.model.btnSearchStatus = BtnStatus.display;
-        if (this.model.employees.length) {
-            this.model.btnModifyStatus = BtnStatus.display;
-        }
-        this.model.btnSaveStatus = BtnStatus.hidden;
-        this.model.btnCancelStatus = BtnStatus.hidden;
-        this.clearTempTable();
-        this.view.updateView();
     }
 
     cancelChanges() {
