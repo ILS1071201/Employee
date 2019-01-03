@@ -48,7 +48,8 @@ var TempEmployeeStatus;
     TempEmployeeStatus[TempEmployeeStatus["modify"] = 0] = "modify";
     TempEmployeeStatus[TempEmployeeStatus["insert"] = 1] = "insert";
     TempEmployeeStatus[TempEmployeeStatus["update"] = 2] = "update";
-    TempEmployeeStatus[TempEmployeeStatus["delete"] = 3] = "delete";
+    TempEmployeeStatus[TempEmployeeStatus["deleteOfModify"] = 3] = "deleteOfModify";
+    TempEmployeeStatus[TempEmployeeStatus["deleteOfUpdate"] = 4] = "deleteOfUpdate";
 })(TempEmployeeStatus || (TempEmployeeStatus = {}));
 var BtnStatus;
 (function (BtnStatus) {
@@ -135,9 +136,14 @@ var EmployeeView = /** @class */ (function () {
     EmployeeView.prototype.showInputTable = function () {
         var htmlEmployeeInputList = '';
         for (var i = 0; i < this.model.tempEmployees.length; i++) {
+            var deleteBtnText = 'X';
             var display = '';
-            if (this.model.tempEmployees[i].status === TempEmployeeStatus.delete) {
-                display = 'd-none';
+            var status_1 = '';
+            if (this.model.tempEmployees[i].status === TempEmployeeStatus.deleteOfModify ||
+                this.model.tempEmployees[i].status === TempEmployeeStatus.deleteOfUpdate) {
+                //display = 'd-none';
+                status_1 = 'disabled';
+                deleteBtnText = 'O';
             }
             var htmlDepartmentOptions = '';
             if (!this.model.tempEmployees[i].department) {
@@ -153,7 +159,7 @@ var EmployeeView = /** @class */ (function () {
                 }
             }
             htmlEmployeeInputList +=
-                "<tr class=\"" + display + "\">\n                    <th scope=\"row\">\n                        <button type=\"button\" class=\"btn btn-secondary btn-sm delete idx" + i + "\">X</button>\n                    </th>\n                    <td>\n                        <input type=\"text\" class=\"form-control employeeNumber idx" + i + "\" value=\"" + this.model.tempEmployees[i].employeeNumber + "\" required>\n                    </td>\n                    <td>\n                        <input type=\"text\" class=\"form-control name idx" + i + "\" value=\"" + this.model.tempEmployees[i].name + "\" required>\n                    </td>\n                    <td>\n                        <select class=\"form-control department idx" + i + "\" required>\n                            " + htmlDepartmentOptions + "\n                        </select>\n                    </td>\n                    <td>\n                        <input type=\"text\" class=\"form-control jobTitle idx" + i + "\" value=\"" + this.model.tempEmployees[i].jobTitle + "\" required>\n                    </td>\n                    <td>\n                        <input type=\"date\" class=\"form-control hireDate idx" + i + "\" value=\"" + this.model.tempEmployees[i].hireDate + "\" required>\n                    </td>\n                </tr>";
+                "<tr class=\"" + display + "\">\n                    <th scope=\"row\">\n                        <button type=\"button\" class=\"btn btn-secondary btn-sm delete idx" + i + "\">" + deleteBtnText + "</button>\n                    </th>\n                    <td>\n                        <input type=\"text\" class=\"form-control employeeNumber idx" + i + "\" value=\"" + this.model.tempEmployees[i].employeeNumber + "\"  " + status_1 + " required>\n                    </td>\n                    <td>\n                        <input type=\"text\" class=\"form-control name idx" + i + "\" value=\"" + this.model.tempEmployees[i].name + "\"  " + status_1 + " required>\n                    </td>\n                    <td>\n                        <select class=\"form-control department idx" + i + "\"  " + status_1 + " required>\n                            " + htmlDepartmentOptions + "\n                        </select>\n                    </td>\n                    <td>\n                        <input type=\"text\" class=\"form-control jobTitle idx" + i + "\" value=\"" + this.model.tempEmployees[i].jobTitle + "\"  " + status_1 + " required>\n                    </td>\n                    <td>\n                        <input type=\"date\" class=\"form-control hireDate idx" + i + "\" value=\"" + this.model.tempEmployees[i].hireDate + "\"  " + status_1 + " required>\n                    </td>\n                </tr>";
         }
         this.table.html(htmlEmployeeInputList);
     };
@@ -314,8 +320,17 @@ var EmployeeController = /** @class */ (function () {
             if (_this.model.tempEmployees[index].status === TempEmployeeStatus.insert) {
                 _this.model.tempEmployees.splice(index, 1);
             }
-            else {
-                _this.model.tempEmployees[index].status = TempEmployeeStatus.delete;
+            else if (_this.model.tempEmployees[index].status === TempEmployeeStatus.modify) {
+                _this.model.tempEmployees[index].status = TempEmployeeStatus.deleteOfModify;
+            }
+            else if (_this.model.tempEmployees[index].status === TempEmployeeStatus.update) {
+                _this.model.tempEmployees[index].status = TempEmployeeStatus.deleteOfUpdate;
+            }
+            else if (_this.model.tempEmployees[index].status === TempEmployeeStatus.deleteOfModify) {
+                _this.model.tempEmployees[index].status = TempEmployeeStatus.modify;
+            }
+            else if (_this.model.tempEmployees[index].status === TempEmployeeStatus.deleteOfUpdate) {
+                _this.model.tempEmployees[index].status = TempEmployeeStatus.update;
             }
             _this.view.updateView();
             _this.bindTable();
@@ -372,7 +387,8 @@ var EmployeeController = /** @class */ (function () {
             else if (tempEmployee.status === TempEmployeeStatus.update) {
                 Data.update.push(temp);
             }
-            else if (tempEmployee.status === TempEmployeeStatus.delete) {
+            else if (tempEmployee.status === TempEmployeeStatus.deleteOfModify ||
+                tempEmployee.status === TempEmployeeStatus.deleteOfUpdate) {
                 Data.delete.push(temp);
             }
         }

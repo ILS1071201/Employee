@@ -1,0 +1,20 @@
+<ROOT>
+    <Employee>
+        <ActionID>U</ActionID>
+        <EmployeeID>8</EmployeeID>
+        <EmployeeNumber>A0002</EmployeeNumber>
+        <Name>BBBBB</Name>
+        <Department>C部門</Department>
+        <JobTitle>工程師</JobTitle>
+        <HireDate>2018-01-01</HireDate>
+    </Employee>
+    <Employee>
+        <ActionID>U</ActionID>
+        <EmployeeID>10</EmployeeID>
+        <EmployeeNumber>A0004</EmployeeNumber>
+        <Name>DDDDD</Name>
+        <Department>A部門</Department>
+        <JobTitle>工程師</JobTitle>
+        <HireDate>2018-01-02</HireDate>
+    </Employee>
+</ROOT>

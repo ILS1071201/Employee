@@ -45,7 +45,8 @@ enum TempEmployeeStatus {
     modify,
     insert,
     update,
-    delete
+    deleteOfModify,
+    deleteOfUpdate
 }
 
 enum BtnStatus {
@@ -173,9 +174,14 @@ class EmployeeView {
         let htmlEmployeeInputList = '';
 
         for (let i = 0; i < this.model.tempEmployees.length; i++) {
+            let deleteBtnText = 'X';
             let display = '';
-            if (this.model.tempEmployees[i].status === TempEmployeeStatus.delete) {
-                display = 'd-none';
+            let status = '';
+            if (this.model.tempEmployees[i].status === TempEmployeeStatus.deleteOfModify ||
+                this.model.tempEmployees[i].status === TempEmployeeStatus.deleteOfUpdate) {
+                //display = 'd-none';
+                status = 'disabled';
+                deleteBtnText = 'O';
             }
 
             let htmlDepartmentOptions = '';
@@ -193,24 +199,24 @@ class EmployeeView {
             htmlEmployeeInputList +=
                 `<tr class="${display}">
                     <th scope="row">
-                        <button type="button" class="btn btn-secondary btn-sm delete idx${i}">X</button>
+                        <button type="button" class="btn btn-secondary btn-sm delete idx${i}">${deleteBtnText}</button>
                     </th>
                     <td>
-                        <input type="text" class="form-control employeeNumber idx${i}" value="${this.model.tempEmployees[i].employeeNumber}" required>
+                        <input type="text" class="form-control employeeNumber idx${i}" value="${this.model.tempEmployees[i].employeeNumber}"  ${status} required>
                     </td>
                     <td>
-                        <input type="text" class="form-control name idx${i}" value="${this.model.tempEmployees[i].name}" required>
+                        <input type="text" class="form-control name idx${i}" value="${this.model.tempEmployees[i].name}"  ${status} required>
                     </td>
                     <td>
-                        <select class="form-control department idx${i}" required>
+                        <select class="form-control department idx${i}"  ${status} required>
                             ${htmlDepartmentOptions}
                         </select>
                     </td>
                     <td>
-                        <input type="text" class="form-control jobTitle idx${i}" value="${this.model.tempEmployees[i].jobTitle}" required>
+                        <input type="text" class="form-control jobTitle idx${i}" value="${this.model.tempEmployees[i].jobTitle}"  ${status} required>
                     </td>
                     <td>
-                        <input type="date" class="form-control hireDate idx${i}" value="${this.model.tempEmployees[i].hireDate}" required>
+                        <input type="date" class="form-control hireDate idx${i}" value="${this.model.tempEmployees[i].hireDate}"  ${status} required>
                     </td>
                 </tr>`
         }
@@ -407,8 +413,14 @@ class EmployeeController {
         this.view.table.find('.delete').each((index, element) => $(element).click(() => {
             if (this.model.tempEmployees[index].status === TempEmployeeStatus.insert) {
                 this.model.tempEmployees.splice(index, 1);
-            } else {
-                this.model.tempEmployees[index].status = TempEmployeeStatus.delete;
+            } else if (this.model.tempEmployees[index].status === TempEmployeeStatus.modify) {
+                this.model.tempEmployees[index].status = TempEmployeeStatus.deleteOfModify;
+            } else if (this.model.tempEmployees[index].status === TempEmployeeStatus.update) {
+                this.model.tempEmployees[index].status = TempEmployeeStatus.deleteOfUpdate;
+            } else if (this.model.tempEmployees[index].status === TempEmployeeStatus.deleteOfModify) {
+                this.model.tempEmployees[index].status = TempEmployeeStatus.modify;
+            } else if (this.model.tempEmployees[index].status === TempEmployeeStatus.deleteOfUpdate) {
+                this.model.tempEmployees[index].status = TempEmployeeStatus.update;
             }
             this.view.updateView();
             this.bindTable();
@@ -478,7 +490,8 @@ class EmployeeController {
                 Data.insert.push(temp);
             } else if (tempEmployee.status === TempEmployeeStatus.update) {
                 Data.update.push(temp);
-            } else if (tempEmployee.status === TempEmployeeStatus.delete) {
+            } else if (tempEmployee.status === TempEmployeeStatus.deleteOfModify ||
+                       tempEmployee.status === TempEmployeeStatus.deleteOfUpdate) {
                 Data.delete.push(temp);
             }
         }
