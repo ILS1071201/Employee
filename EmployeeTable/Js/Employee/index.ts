@@ -68,7 +68,7 @@ class EmployeeViewModel {
     employees: Array<Employee>;
     departments: Array<Department>;
     tempEmployees: Array<TempEmployee>;
-    searchText: String;
+    searchText: string;
     btnSearchStatus: BtnStatus;
     btnAddStatus: BtnStatus;
     btnModifyStatus: BtnStatus;
@@ -147,6 +147,8 @@ class EmployeeView {
         } else if (this.model.tableStatus === TableStatus.allowModify) {
             this.showInputTable();
         }
+
+        this.search.val(this.model.searchText);
     }
 
     showTable() {
@@ -348,10 +350,7 @@ class EmployeeController {
 
         const changedEmployeeData = this.sortTempEmployeeData();
 
-        console.log(changedEmployeeData);
-
         this.clearEmployeeData();
-        //TODO: 送出資料、取回資料至Employee
 
         $.ajax({
             type: 'POST',

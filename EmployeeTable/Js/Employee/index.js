@@ -122,6 +122,7 @@ var EmployeeView = /** @class */ (function () {
         else if (this.model.tableStatus === TableStatus.allowModify) {
             this.showInputTable();
         }
+        this.search.val(this.model.searchText);
     };
     EmployeeView.prototype.showTable = function () {
         var htmlEmployeeList = '';
@@ -266,9 +267,7 @@ var EmployeeController = /** @class */ (function () {
             return;
         }
         var changedEmployeeData = this.sortTempEmployeeData();
-        console.log(changedEmployeeData);
         this.clearEmployeeData();
-        //TODO: 送出資料、取回資料至Employee
         $.ajax({
             type: 'POST',
             url: '../Employee/ChangeData',
