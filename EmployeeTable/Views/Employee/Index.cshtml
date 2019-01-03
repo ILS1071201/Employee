@@ -20,7 +20,11 @@
         <h1>員工資料維護</h1>
         <hr>
         <div class="d-flex justify-content-between">
-            <div class="input-group col-3">
+            <div class="input-group col-5">
+                <select class="custom-select col-3" id="searchType">
+                    <option value="employeeNumber" selected>員工編號</option>
+                    <option value="name">姓名</option>
+                </select>
                 <input type="text" class="form-control" placeholder="查詢員工編號" id="searchText" />
                 <div class="input-group-append">
                     <button type="button" class="btn btn-outline-secondary" id="btnSearch">search</button>

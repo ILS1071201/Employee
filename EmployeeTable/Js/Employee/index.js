@@ -61,11 +61,17 @@ var TableStatus;
     TableStatus[TableStatus["onlyDisplay"] = 0] = "onlyDisplay";
     TableStatus[TableStatus["allowModify"] = 1] = "allowModify";
 })(TableStatus || (TableStatus = {}));
+var SearchType;
+(function (SearchType) {
+    SearchType["employeeNumber"] = "employeeNumber";
+    SearchType["name"] = "name";
+})(SearchType || (SearchType = {}));
 var EmployeeViewModel = /** @class */ (function () {
     function EmployeeViewModel() {
         this.employees = new Array();
         this.departments = new Array();
         this.tempEmployees = new Array();
+        this.searchType = '';
         this.searchText = '';
         this.btnSearchStatus = BtnStatus.display;
         this.btnAddStatus = BtnStatus.display;
@@ -82,6 +88,7 @@ var EmployeeView = /** @class */ (function () {
         this.bindHtml();
     }
     EmployeeView.prototype.bindHtml = function () {
+        this.searchType = $('#searchType');
         this.search = $('#searchText');
         this.btnSearch = $('#btnSearch');
         this.btnAdd = $('#btnAdd');
@@ -92,10 +99,12 @@ var EmployeeView = /** @class */ (function () {
     };
     EmployeeView.prototype.updateView = function () {
         if (this.model.btnSearchStatus === BtnStatus.display) {
+            this.searchType.removeClass('d-none');
             this.search.removeClass('d-none');
             this.btnSearch.removeClass('d-none');
         }
         else if (this.model.btnSearchStatus === BtnStatus.hidden) {
+            this.searchType.addClass('d-none');
             this.search.addClass('d-none');
             this.btnSearch.addClass('d-none');
         }
@@ -169,11 +178,21 @@ var EmployeeController = /** @class */ (function () {
     function EmployeeController(model, view) {
         this.model = model;
         this.view = view;
+        this.model.searchType = this.view.searchType.val();
         this.subscribeEvents();
         this.view.updateView();
     }
     EmployeeController.prototype.subscribeEvents = function () {
         var _this = this;
+        this.view.searchType.change(function () {
+            _this.model.searchType = _this.view.searchType.val();
+            if (_this.model.searchType === SearchType.employeeNumber) {
+                _this.view.search.attr('placeholder', '查詢員工編號');
+            }
+            else if (_this.model.searchType === SearchType.name) {
+                _this.view.search.attr('placeholder', '查詢員工姓名');
+            }
+        });
         this.view.search.change(function () { return _this.model.searchText = _this.view.search.val(); });
         this.view.btnSearch.click(function () { return _this.searchEmployee(); });
         this.view.btnAdd.click(function () { return _this.addTableRow(); });
@@ -185,6 +204,7 @@ var EmployeeController = /** @class */ (function () {
         var _this = this;
         this.clearEmployeeData();
         var data = {
+            searchType: this.model.searchType,
             searchText: this.model.searchText
         };
         $.ajax({

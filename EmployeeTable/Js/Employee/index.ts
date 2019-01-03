@@ -59,6 +59,11 @@ enum TableStatus {
     allowModify
 }
 
+enum SearchType {
+    employeeNumber = 'employeeNumber',
+    name = 'name'
+}
+
 interface InsertUpdateDeleteCollection {
     insert: Array<Employee>,
     update: Array<Employee>,
@@ -69,6 +74,7 @@ class EmployeeViewModel {
     employees: Array<Employee>;
     departments: Array<Department>;
     tempEmployees: Array<TempEmployee>;
+    searchType: string;
     searchText: string;
     btnSearchStatus: BtnStatus;
     btnAddStatus: BtnStatus;
@@ -81,6 +87,7 @@ class EmployeeViewModel {
         this.employees = new Array<Employee>();
         this.departments = new Array<Department>();
         this.tempEmployees = new Array<TempEmployee>();
+        this.searchType = '';
         this.searchText = '';
         this.btnSearchStatus = BtnStatus.display;
         this.btnAddStatus = BtnStatus.display;
@@ -93,6 +100,7 @@ class EmployeeViewModel {
 
 class EmployeeView {
     model: EmployeeViewModel;
+    searchType: JQuery;
     search: JQuery;
     btnSearch: JQuery;
     btnAdd: JQuery;
@@ -107,6 +115,7 @@ class EmployeeView {
     }
 
     bindHtml() {
+        this.searchType = $('#searchType');
         this.search = $('#searchText');
         this.btnSearch = $('#btnSearch');
         this.btnAdd = $('#btnAdd');
@@ -118,9 +127,11 @@ class EmployeeView {
 
     updateView() {
         if (this.model.btnSearchStatus === BtnStatus.display) {
+            this.searchType.removeClass('d-none');
             this.search.removeClass('d-none');
             this.btnSearch.removeClass('d-none');
         } else if (this.model.btnSearchStatus === BtnStatus.hidden) {
+            this.searchType.addClass('d-none');
             this.search.addClass('d-none');
             this.btnSearch.addClass('d-none');
         }
@@ -233,11 +244,20 @@ class EmployeeController {
     constructor(model: EmployeeViewModel, view: EmployeeView) {
         this.model = model;
         this.view = view;
+        this.model.searchType = this.view.searchType.val();
         this.subscribeEvents();
         this.view.updateView();
     }
 
     subscribeEvents() {
+        this.view.searchType.change(() => {
+            this.model.searchType = this.view.searchType.val();
+            if (this.model.searchType === SearchType.employeeNumber) {
+                this.view.search.attr('placeholder', '查詢員工編號');
+            } else if (this.model.searchType === SearchType.name) {
+                this.view.search.attr('placeholder', '查詢員工姓名');
+            }
+        });
         this.view.search.change(() => this.model.searchText = this.view.search.val());
         this.view.btnSearch.click(() => this.searchEmployee());
         this.view.btnAdd.click(() => this.addTableRow());
@@ -249,6 +269,7 @@ class EmployeeController {
     searchEmployee() {
         this.clearEmployeeData();
         let data = {
+            searchType: this.model.searchType,
             searchText: this.model.searchText
         }
 
@@ -491,11 +512,10 @@ class EmployeeController {
             } else if (tempEmployee.status === TempEmployeeStatus.update) {
                 Data.update.push(temp);
             } else if (tempEmployee.status === TempEmployeeStatus.deleteOfModify ||
-                       tempEmployee.status === TempEmployeeStatus.deleteOfUpdate) {
+                tempEmployee.status === TempEmployeeStatus.deleteOfUpdate) {
                 Data.delete.push(temp);
             }
         }
         return Data;
     }
-
 }

@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml.Linq;
@@ -22,12 +23,25 @@ namespace EmployeeTable.Controllers
         }
 
         [HttpPost]
-        public ActionResult SearchEmployees(string searchText)
+        public ActionResult SearchEmployees(string searchType, string searchText)
         {
             var dt = new DataTable();
+            var SPCommand = string.Empty;
+            if (searchType == "employeeNumber")
+            {
+                SPCommand = "USP_Employee_S00";
+            }else if (searchType == "name")
+            {
+                SPCommand = "USP_Employee_S01";
+            }
+            else
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
             using (var con = new SqlConnection(_connectionString))
             {
-                var cmd = new SqlCommand("USP_Employee_S00", con);
+                var cmd = new SqlCommand(SPCommand, con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@I_CHR_SearchText", SqlDbType.VarChar, 10).Value = searchText;
                 con.Open();
