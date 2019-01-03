@@ -1,7 +1,14 @@
+USE [EmployeeData]
+GO
+
+/****** Object:  StoredProcedure [dbo].[USP_Employee_XML]    Script Date: 2019/1/3 ¤U¤È 06:02:03 ******/
 SET ANSI_NULLS ON
 GO
+
 SET QUOTED_IDENTIFIER ON
 GO
+
+
 
 CREATE PROCEDURE [dbo].[USP_Employee_XML]
     @I_XML_DATA         XML
@@ -32,8 +39,9 @@ BEGIN
             @CHR_JobTitle           NVARCHAR(50),
             @DTE_HireDate           DATE,
             @CHR_DepartmentNumber   VARCHAR(10)
-
-    DECLARE @INT_IDOC               INT
+			
+    DECLARE @INT_IDOC               INT,
+			@INT_RC					INT
 
     SET NOCOUNT ON
 
@@ -85,11 +93,14 @@ BEGIN
         IF @CHR_ActionID = 'I'
         BEGIN
             BEGIN TRY
-            EXEC USP_Employee_I00 @CHR_EmployeeNumber, @CHR_Name, @CHR_DepartmentNumber, @CHR_JobTitle, @DTE_HireDate
+            EXEC @INT_RC = USP_Employee_I00 @CHR_EmployeeNumber, @CHR_Name, @CHR_DepartmentNumber, @CHR_JobTitle, @DTE_HireDate
             
-            INSERT INTO #TEMP_Result
-                (ActionID, EmployeeID)
-            VALUES(@CHR_ActionID, @INT_EmployeeID)
+			IF (@INT_RC <> 0)
+			BEGIN
+				INSERT INTO #TEMP_Result
+					(ActionID, EmployeeID)
+				VALUES(@CHR_ActionID, @INT_RC)
+			END
             END TRY
             BEGIN CATCH
         
@@ -115,3 +126,5 @@ BEGIN
     RETURN
 END
 GO
+
+

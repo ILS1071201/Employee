@@ -108,6 +108,12 @@ var EmployeeView = /** @class */ (function () {
             this.search.addClass('d-none');
             this.btnSearch.addClass('d-none');
         }
+        if (this.model.btnAddStatus === BtnStatus.display) {
+            this.btnAdd.removeClass('d-none');
+        }
+        else if (this.model.btnAddStatus === BtnStatus.hidden) {
+            this.btnAdd.addClass('d-none');
+        }
         if (this.model.btnModifyStatus === BtnStatus.display) {
             this.btnModify.removeClass('d-none');
         }
@@ -203,6 +209,7 @@ var EmployeeController = /** @class */ (function () {
     EmployeeController.prototype.searchEmployee = function () {
         var _this = this;
         this.clearEmployeeData();
+        this.model.btnModifyStatus = BtnStatus.hidden;
         var data = {
             searchType: this.model.searchType,
             searchText: this.model.searchText
@@ -213,7 +220,7 @@ var EmployeeController = /** @class */ (function () {
             data: data,
             dataType: 'json'
         }).done(function (employees) {
-            if (employees) {
+            if (Array.isArray(employees) && employees.length) {
                 for (var _i = 0, employees_1 = employees; _i < employees_1.length; _i++) {
                     var employee = employees_1[_i];
                     var temp = new Employee(employee.EmployeeID, employee.EmployeeNumber, employee.Name, employee.Department, employee.JobTitle, employee.HireDate);
@@ -237,7 +244,7 @@ var EmployeeController = /** @class */ (function () {
             url: '../Employee/GetAllDepartments',
             dataType: 'json'
         }).done(function (departments) {
-            if (departments) {
+            if (Array.isArray(departments) && departments.length) {
                 for (var _i = 0, departments_1 = departments; _i < departments_1.length; _i++) {
                     var department = departments_1[_i];
                     var temp = new Department(department.Name);
@@ -264,7 +271,7 @@ var EmployeeController = /** @class */ (function () {
             url: '../Employee/GetAllDepartments',
             dataType: 'json'
         }).done(function (departments) {
-            if (departments) {
+            if (Array.isArray(departments) && departments.length) {
                 for (var _i = 0, departments_2 = departments; _i < departments_2.length; _i++) {
                     var department = departments_2[_i];
                     var temp = new Department(department.Name);
@@ -300,14 +307,13 @@ var EmployeeController = /** @class */ (function () {
             data: changedEmployeeData,
             dataType: 'json'
         }).done(function (employees) {
-            if (employees) {
+            if (Array.isArray(employees) && employees.length) {
                 for (var _i = 0, employees_2 = employees; _i < employees_2.length; _i++) {
                     var employee = employees_2[_i];
                     var temp = new Employee(employee.EmployeeID, employee.EmployeeNumber, employee.Name, employee.Department, employee.JobTitle, employee.HireDate);
                     _this.model.employees.push(temp);
                 }
             }
-            _this.model.searchText = '';
             _this.model.tableStatus = TableStatus.onlyDisplay;
             _this.model.btnSearchStatus = BtnStatus.display;
             if (_this.model.employees.length) {

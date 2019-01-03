@@ -11,6 +11,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <style>
+        form {
+            margin-top:10px;
+        }
+    </style>
     <title>Employee</title>
 </head>
 
@@ -27,29 +32,29 @@
                 </select>
                 <input type="text" class="form-control" placeholder="查詢員工編號" id="searchText" />
                 <div class="input-group-append">
-                    <button type="button" class="btn btn-outline-secondary" id="btnSearch">search</button>
+                    <button type="button" class="btn btn-outline-secondary" id="btnSearch">查詢</button>
                 </div>
             </div>
             <div class="">
                 <h5></h5>
             </div>
             <div class="">
-                <button type="button" class="btn btn-primary ml-md-auto" id="btnAdd">新增</button>
-                <button type="button" class="btn btn-primary ml-md-auto" id="btnModify">修改</button>
-                <button type="button" class="btn btn-primary ml-md-auto" id="btnSave">保存</button>
-                <button type="button" class="btn btn-primary ml-md-auto" id="btnCancel">取消</button>
+                <button type="button" class="btn btn-primary ml-md-auto d-none" id="btnAdd">新增</button>
+                <button type="button" class="btn btn-primary ml-md-auto d-none" id="btnModify">修改</button>
+                <button type="button" class="btn btn-primary ml-md-auto d-none" id="btnSave">保存</button>
+                <button type="button" class="btn btn-primary ml-md-auto d-none" id="btnCancel">取消</button>
             </div>
         </div>
         <form>
-            <table class="table table-hover">
+            <table class="table table-hover table-striped table-bordered">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">員工編號</th>
-                        <th scope="col">姓名</th>
-                        <th scope="col">部門名稱</th>
-                        <th scope="col">職位</th>
-                        <th scope="col">聘用日期</th>
+                        <th scope="col" style="width:5%">#</th>
+                        <th scope="col" style="width:19%">員工編號</th>
+                        <th scope="col" style="width:19%">姓名</th>
+                        <th scope="col" style="width:19%">部門名稱</th>
+                        <th scope="col" style="width:19%">職位</th>
+                        <th scope="col" style="width:19%">聘用日期</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>

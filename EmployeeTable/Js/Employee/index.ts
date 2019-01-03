@@ -136,6 +136,12 @@ class EmployeeView {
             this.btnSearch.addClass('d-none');
         }
 
+        if (this.model.btnAddStatus === BtnStatus.display) {
+            this.btnAdd.removeClass('d-none');
+        } else if (this.model.btnAddStatus === BtnStatus.hidden) {
+            this.btnAdd.addClass('d-none');
+        }
+
         if (this.model.btnModifyStatus === BtnStatus.display) {
             this.btnModify.removeClass('d-none');
         } else if (this.model.btnModifyStatus === BtnStatus.hidden) {
@@ -268,6 +274,7 @@ class EmployeeController {
 
     searchEmployee() {
         this.clearEmployeeData();
+        this.model.btnModifyStatus = BtnStatus.hidden;
         let data = {
             searchType: this.model.searchType,
             searchText: this.model.searchText
@@ -279,7 +286,7 @@ class EmployeeController {
             data: data,
             dataType: 'json'
         }).done((employees) => {
-            if (employees) {
+            if (Array.isArray(employees) && employees.length) {
                 for (const employee of employees) {
                     let temp = new Employee(
                         employee.EmployeeID,
@@ -311,7 +318,7 @@ class EmployeeController {
             url: '../Employee/GetAllDepartments',
             dataType: 'json'
         }).done((departments) => {
-            if (departments) {
+            if (Array.isArray(departments) && departments.length) {
                 for (const department of departments) {
                     let temp = new Department(department.Name);
 
@@ -342,7 +349,7 @@ class EmployeeController {
             url: '../Employee/GetAllDepartments',
             dataType: 'json'
         }).done((departments) => {
-            if (departments) {
+            if (Array.isArray(departments) && departments.length) {
                 for (const department of departments) {
                     let temp = new Department(department.Name);
 
@@ -385,7 +392,7 @@ class EmployeeController {
             data: changedEmployeeData,
             dataType: 'json'
         }).done((employees) => {
-            if (employees) {
+            if (Array.isArray(employees) && employees.length) {
                 for (const employee of employees) {
                     let temp = new Employee(
                         employee.EmployeeID,
@@ -399,7 +406,6 @@ class EmployeeController {
                 }
             }
 
-            this.model.searchText = '';
             this.model.tableStatus = TableStatus.onlyDisplay;
             this.model.btnSearchStatus = BtnStatus.display;
             if (this.model.employees.length) {
