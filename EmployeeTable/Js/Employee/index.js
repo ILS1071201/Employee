@@ -55,24 +55,21 @@ var BtnStatus;
 (function (BtnStatus) {
     BtnStatus[BtnStatus["display"] = 0] = "display";
     BtnStatus[BtnStatus["hidden"] = 1] = "hidden";
+    BtnStatus[BtnStatus["disabled"] = 2] = "disabled";
 })(BtnStatus || (BtnStatus = {}));
 var TableStatus;
 (function (TableStatus) {
     TableStatus[TableStatus["onlyDisplay"] = 0] = "onlyDisplay";
     TableStatus[TableStatus["allowModify"] = 1] = "allowModify";
 })(TableStatus || (TableStatus = {}));
-var SearchType;
-(function (SearchType) {
-    SearchType["employeeNumber"] = "employeeNumber";
-    SearchType["name"] = "name";
-})(SearchType || (SearchType = {}));
 var EmployeeViewModel = /** @class */ (function () {
     function EmployeeViewModel() {
         this.employees = new Array();
         this.departments = new Array();
         this.tempEmployees = new Array();
-        this.searchType = '';
-        this.searchText = '';
+        this.searchEmployeeNumber = '';
+        this.searchName = '';
+        this.selectedDepartmentName = '';
         this.btnSearchStatus = BtnStatus.display;
         this.btnAddStatus = BtnStatus.display;
         this.btnModifyStatus = BtnStatus.hidden;
@@ -88,8 +85,9 @@ var EmployeeView = /** @class */ (function () {
         this.bindHtml();
     }
     EmployeeView.prototype.bindHtml = function () {
-        this.searchType = $('#searchType');
-        this.search = $('#searchText');
+        this.textSearchEmployeeNumber = $('#textSearchEmployeeNumber');
+        this.textSearchName = $('#textSearchName');
+        this.selectDepartment = $('#selectedDepartment');
         this.btnSearch = $('#btnSearch');
         this.btnAdd = $('#btnAdd');
         this.btnModify = $('#btnModify');
@@ -99,14 +97,10 @@ var EmployeeView = /** @class */ (function () {
     };
     EmployeeView.prototype.updateView = function () {
         if (this.model.btnSearchStatus === BtnStatus.display) {
-            this.searchType.removeClass('d-none');
-            this.search.removeClass('d-none');
-            this.btnSearch.removeClass('d-none');
+            this.btnSearch.prop('disabled', false);
         }
-        else if (this.model.btnSearchStatus === BtnStatus.hidden) {
-            this.searchType.addClass('d-none');
-            this.search.addClass('d-none');
-            this.btnSearch.addClass('d-none');
+        else if (this.model.btnSearchStatus === BtnStatus.disabled) {
+            this.btnSearch.prop('disabled', true);
         }
         if (this.model.btnAddStatus === BtnStatus.display) {
             this.btnAdd.removeClass('d-none');
@@ -138,7 +132,8 @@ var EmployeeView = /** @class */ (function () {
         else if (this.model.tableStatus === TableStatus.allowModify) {
             this.showInputTable();
         }
-        this.search.val(this.model.searchText);
+        this.textSearchEmployeeNumber.val(this.model.searchEmployeeNumber);
+        this.textSearchName.val(this.model.searchName);
     };
     EmployeeView.prototype.showTable = function () {
         var htmlEmployeeList = '';
@@ -151,14 +146,12 @@ var EmployeeView = /** @class */ (function () {
     EmployeeView.prototype.showInputTable = function () {
         var htmlEmployeeInputList = '';
         for (var i = 0; i < this.model.tempEmployees.length; i++) {
-            var deleteBtnText = 'X';
-            var display = '';
+            var deleteBtnIcon = '<i class="far fa-trash-alt"></i>';
             var status_1 = '';
             if (this.model.tempEmployees[i].status === TempEmployeeStatus.deleteOfModify ||
                 this.model.tempEmployees[i].status === TempEmployeeStatus.deleteOfUpdate) {
-                //display = 'd-none';
                 status_1 = 'disabled';
-                deleteBtnText = 'O';
+                deleteBtnIcon = '<i class="fas fa-undo" ></i>';
             }
             var htmlDepartmentOptions = '';
             if (!this.model.tempEmployees[i].department) {
@@ -174,9 +167,20 @@ var EmployeeView = /** @class */ (function () {
                 }
             }
             htmlEmployeeInputList +=
-                "<tr class=\"" + display + "\">\n                    <th scope=\"row\">\n                        <button type=\"button\" class=\"btn btn-secondary btn-sm delete idx" + i + "\">" + deleteBtnText + "</button>\n                    </th>\n                    <td>\n                        <input type=\"text\" class=\"form-control employeeNumber idx" + i + "\" value=\"" + this.model.tempEmployees[i].employeeNumber + "\"  " + status_1 + " required>\n                    </td>\n                    <td>\n                        <input type=\"text\" class=\"form-control name idx" + i + "\" value=\"" + this.model.tempEmployees[i].name + "\"  " + status_1 + " required>\n                    </td>\n                    <td>\n                        <select class=\"form-control department idx" + i + "\"  " + status_1 + " required>\n                            " + htmlDepartmentOptions + "\n                        </select>\n                    </td>\n                    <td>\n                        <input type=\"text\" class=\"form-control jobTitle idx" + i + "\" value=\"" + this.model.tempEmployees[i].jobTitle + "\"  " + status_1 + " required>\n                    </td>\n                    <td>\n                        <input type=\"date\" class=\"form-control hireDate idx" + i + "\" value=\"" + this.model.tempEmployees[i].hireDate + "\"  " + status_1 + " required>\n                    </td>\n                </tr>";
+                "<tr>\n                    <th scope=\"row\">\n                        <button type=\"button\" class=\"btn btn-secondary btn-sm delete idx" + i + "\">" + deleteBtnIcon + "</button>\n                    </th>\n                    <td>\n                        <input type=\"text\" class=\"form-control employeeNumber idx" + i + "\" value=\"" + this.model.tempEmployees[i].employeeNumber + "\"  " + status_1 + " required>\n                    </td>\n                    <td>\n                        <input type=\"text\" class=\"form-control name idx" + i + "\" value=\"" + this.model.tempEmployees[i].name + "\"  " + status_1 + " required>\n                    </td>\n                    <td>\n                        <select class=\"form-control department idx" + i + "\"  " + status_1 + " required>\n                            " + htmlDepartmentOptions + "\n                        </select>\n                    </td>\n                    <td>\n                        <input type=\"text\" class=\"form-control jobTitle idx" + i + "\" value=\"" + this.model.tempEmployees[i].jobTitle + "\"  " + status_1 + " required>\n                    </td>\n                    <td>\n                        <input type=\"date\" class=\"form-control hireDate idx" + i + "\" value=\"" + this.model.tempEmployees[i].hireDate + "\"  " + status_1 + " required>\n                    </td>\n                </tr>";
         }
         this.table.html(htmlEmployeeInputList);
+    };
+    EmployeeView.prototype.refreshDepartmentListOfSearch = function () {
+        if (this.selectDepartment.find('option').length != this.model.departments.length + 1) {
+            var options = '<option value="" selected>選擇部門...</option>';
+            for (var _i = 0, _a = this.model.departments; _i < _a.length; _i++) {
+                var department = _a[_i];
+                options += "<option value=\"" + department.name + "\">" + department.name + "</option>";
+            }
+            this.selectDepartment.html(options);
+            this.selectDepartment.trigger('blur');
+        }
     };
     return EmployeeView;
 }());
@@ -184,24 +188,18 @@ var EmployeeController = /** @class */ (function () {
     function EmployeeController(model, view) {
         this.model = model;
         this.view = view;
-        this.model.searchType = this.view.searchType.val();
         this.subscribeEvents();
         this.view.updateView();
+        this.getDepartmentsForSearch();
     }
     EmployeeController.prototype.subscribeEvents = function () {
         var _this = this;
-        this.view.searchType.change(function () {
-            _this.model.searchType = _this.view.searchType.val();
-            if (_this.model.searchType === SearchType.employeeNumber) {
-                _this.view.search.attr('placeholder', '查詢員工編號');
-            }
-            else if (_this.model.searchType === SearchType.name) {
-                _this.view.search.attr('placeholder', '查詢員工姓名');
-            }
-        });
-        this.view.search.change(function () { return _this.model.searchText = _this.view.search.val(); });
+        this.view.textSearchEmployeeNumber.change(function () { return _this.model.searchEmployeeNumber = _this.view.textSearchEmployeeNumber.val(); });
+        this.view.textSearchName.change(function () { return _this.model.searchName = _this.view.textSearchName.val(); });
+        this.view.selectDepartment.click(function () { return _this.getDepartmentsForSearch(); });
+        this.view.selectDepartment.change(function () { return _this.model.selectedDepartmentName = _this.view.selectDepartment.val(); });
         this.view.btnSearch.click(function () { return _this.searchEmployee(); });
-        this.view.btnAdd.click(function () { return _this.addTableRow(); });
+        this.view.btnAdd.click(function () { return _this.addTable(); });
         this.view.btnModify.click(function () { return _this.modifyTable(); });
         this.view.btnSave.click(function () { return _this.saveTable(); });
         this.view.btnCancel.click(function () { return _this.cancelChanges(); });
@@ -211,8 +209,9 @@ var EmployeeController = /** @class */ (function () {
         this.clearEmployeeData();
         this.model.btnModifyStatus = BtnStatus.hidden;
         var data = {
-            searchType: this.model.searchType,
-            searchText: this.model.searchText
+            employeeNumber: this.model.searchEmployeeNumber,
+            name: this.model.searchName,
+            department: this.model.selectedDepartmentName
         };
         $.ajax({
             type: 'POST',
@@ -231,10 +230,20 @@ var EmployeeController = /** @class */ (function () {
             _this.view.updateView();
         });
     };
+    EmployeeController.prototype.addTable = function () {
+        var _this = this;
+        if (this.model.employees && this.model.tableStatus === TableStatus.onlyDisplay) {
+            $.when(this.modifyTable())
+                .done(function () { return _this.addTableRow(); });
+        }
+        else {
+            this.addTableRow();
+        }
+    };
     EmployeeController.prototype.addTableRow = function () {
         var _this = this;
         this.model.tableStatus = TableStatus.allowModify;
-        this.model.btnSearchStatus = BtnStatus.hidden;
+        this.model.btnSearchStatus = BtnStatus.disabled;
         this.model.btnModifyStatus = BtnStatus.hidden;
         this.model.btnSaveStatus = BtnStatus.display;
         this.model.btnCancelStatus = BtnStatus.display;
@@ -261,11 +270,12 @@ var EmployeeController = /** @class */ (function () {
     EmployeeController.prototype.modifyTable = function () {
         var _this = this;
         this.model.tableStatus = TableStatus.allowModify;
-        this.model.btnSearchStatus = BtnStatus.hidden;
+        this.model.btnSearchStatus = BtnStatus.disabled;
         this.model.btnModifyStatus = BtnStatus.hidden;
         this.model.btnSaveStatus = BtnStatus.display;
         this.model.btnCancelStatus = BtnStatus.display;
         this.model.departments.length = 0;
+        var deferred = $.Deferred();
         $.ajax({
             type: 'POST',
             url: '../Employee/GetAllDepartments',
@@ -292,7 +302,9 @@ var EmployeeController = /** @class */ (function () {
             }
             _this.view.updateView();
             _this.bindTable();
+            deferred.resolve();
         });
+        return deferred;
     };
     EmployeeController.prototype.saveTable = function () {
         var _this = this;
@@ -419,6 +431,24 @@ var EmployeeController = /** @class */ (function () {
             }
         }
         return Data;
+    };
+    EmployeeController.prototype.getDepartmentsForSearch = function () {
+        var _this = this;
+        this.model.departments.length = 0;
+        $.ajax({
+            type: 'POST',
+            url: '../Employee/GetAllDepartments',
+            dataType: 'json'
+        }).done(function (departments) {
+            if (Array.isArray(departments) && departments.length) {
+                for (var _i = 0, departments_3 = departments; _i < departments_3.length; _i++) {
+                    var department = departments_3[_i];
+                    var temp = new Department(department.Name);
+                    _this.model.departments.push(temp);
+                }
+            }
+            _this.view.refreshDepartmentListOfSearch();
+        });
     };
     return EmployeeController;
 }());

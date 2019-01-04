@@ -51,17 +51,13 @@ enum TempEmployeeStatus {
 
 enum BtnStatus {
     display,
-    hidden
+    hidden,
+    disabled
 }
 
 enum TableStatus {
     onlyDisplay,
     allowModify
-}
-
-enum SearchType {
-    employeeNumber = 'employeeNumber',
-    name = 'name'
 }
 
 interface InsertUpdateDeleteCollection {
@@ -74,8 +70,9 @@ class EmployeeViewModel {
     employees: Array<Employee>;
     departments: Array<Department>;
     tempEmployees: Array<TempEmployee>;
-    searchType: string;
-    searchText: string;
+    searchEmployeeNumber: string;
+    searchName: string;
+    selectedDepartmentName: string;
     btnSearchStatus: BtnStatus;
     btnAddStatus: BtnStatus;
     btnModifyStatus: BtnStatus;
@@ -87,8 +84,9 @@ class EmployeeViewModel {
         this.employees = new Array<Employee>();
         this.departments = new Array<Department>();
         this.tempEmployees = new Array<TempEmployee>();
-        this.searchType = '';
-        this.searchText = '';
+        this.searchEmployeeNumber = '';
+        this.searchName = '';
+        this.selectedDepartmentName = '';
         this.btnSearchStatus = BtnStatus.display;
         this.btnAddStatus = BtnStatus.display;
         this.btnModifyStatus = BtnStatus.hidden;
@@ -100,8 +98,9 @@ class EmployeeViewModel {
 
 class EmployeeView {
     model: EmployeeViewModel;
-    searchType: JQuery;
-    search: JQuery;
+    textSearchEmployeeNumber: JQuery;
+    textSearchName: JQuery;
+    selectDepartment: JQuery;
     btnSearch: JQuery;
     btnAdd: JQuery;
     btnModify: JQuery;
@@ -115,8 +114,9 @@ class EmployeeView {
     }
 
     bindHtml() {
-        this.searchType = $('#searchType');
-        this.search = $('#searchText');
+        this.textSearchEmployeeNumber = $('#textSearchEmployeeNumber');
+        this.textSearchName = $('#textSearchName');
+        this.selectDepartment = $('#selectedDepartment');
         this.btnSearch = $('#btnSearch');
         this.btnAdd = $('#btnAdd');
         this.btnModify = $('#btnModify');
@@ -127,13 +127,9 @@ class EmployeeView {
 
     updateView() {
         if (this.model.btnSearchStatus === BtnStatus.display) {
-            this.searchType.removeClass('d-none');
-            this.search.removeClass('d-none');
-            this.btnSearch.removeClass('d-none');
-        } else if (this.model.btnSearchStatus === BtnStatus.hidden) {
-            this.searchType.addClass('d-none');
-            this.search.addClass('d-none');
-            this.btnSearch.addClass('d-none');
+            this.btnSearch.prop('disabled', false);
+        } else if (this.model.btnSearchStatus === BtnStatus.disabled) {
+            this.btnSearch.prop('disabled', true);
         }
 
         if (this.model.btnAddStatus === BtnStatus.display) {
@@ -166,7 +162,8 @@ class EmployeeView {
             this.showInputTable();
         }
 
-        this.search.val(this.model.searchText);
+        this.textSearchEmployeeNumber.val(this.model.searchEmployeeNumber);
+        this.textSearchName.val(this.model.searchName);
     }
 
     showTable() {
@@ -191,14 +188,12 @@ class EmployeeView {
         let htmlEmployeeInputList = '';
 
         for (let i = 0; i < this.model.tempEmployees.length; i++) {
-            let deleteBtnText = 'X';
-            let display = '';
+            let deleteBtnIcon = '<i class="far fa-trash-alt"></i>';
             let status = '';
             if (this.model.tempEmployees[i].status === TempEmployeeStatus.deleteOfModify ||
                 this.model.tempEmployees[i].status === TempEmployeeStatus.deleteOfUpdate) {
-                //display = 'd-none';
                 status = 'disabled';
-                deleteBtnText = 'O';
+                deleteBtnIcon = '<i class="fas fa-undo" ></i>';
             }
 
             let htmlDepartmentOptions = '';
@@ -214,9 +209,9 @@ class EmployeeView {
             }
 
             htmlEmployeeInputList +=
-                `<tr class="${display}">
+                `<tr>
                     <th scope="row">
-                        <button type="button" class="btn btn-secondary btn-sm delete idx${i}">${deleteBtnText}</button>
+                        <button type="button" class="btn btn-secondary btn-sm delete idx${i}">${deleteBtnIcon}</button>
                     </th>
                     <td>
                         <input type="text" class="form-control employeeNumber idx${i}" value="${this.model.tempEmployees[i].employeeNumber}"  ${status} required>
@@ -241,6 +236,17 @@ class EmployeeView {
         this.table.html(htmlEmployeeInputList);
     }
 
+    refreshDepartmentListOfSearch() {
+        if (this.selectDepartment.find('option').length != this.model.departments.length + 1) {
+            let options = '<option value="" selected>選擇部門...</option>';
+            for (const department of this.model.departments) {
+                options += `<option value="${department.name}">${department.name}</option>`
+            }
+            this.selectDepartment.html(options);
+            this.selectDepartment.trigger('blur');
+        }
+    }
+
 }
 
 class EmployeeController {
@@ -250,23 +256,18 @@ class EmployeeController {
     constructor(model: EmployeeViewModel, view: EmployeeView) {
         this.model = model;
         this.view = view;
-        this.model.searchType = this.view.searchType.val();
         this.subscribeEvents();
         this.view.updateView();
+        this.getDepartmentsForSearch();
     }
 
     subscribeEvents() {
-        this.view.searchType.change(() => {
-            this.model.searchType = this.view.searchType.val();
-            if (this.model.searchType === SearchType.employeeNumber) {
-                this.view.search.attr('placeholder', '查詢員工編號');
-            } else if (this.model.searchType === SearchType.name) {
-                this.view.search.attr('placeholder', '查詢員工姓名');
-            }
-        });
-        this.view.search.change(() => this.model.searchText = this.view.search.val());
+        this.view.textSearchEmployeeNumber.change(() => this.model.searchEmployeeNumber = this.view.textSearchEmployeeNumber.val());
+        this.view.textSearchName.change(() => this.model.searchName = this.view.textSearchName.val());
+        this.view.selectDepartment.click(() => this.getDepartmentsForSearch());
+        this.view.selectDepartment.change(() => this.model.selectedDepartmentName = this.view.selectDepartment.val());
         this.view.btnSearch.click(() => this.searchEmployee());
-        this.view.btnAdd.click(() => this.addTableRow());
+        this.view.btnAdd.click(() => this.addTable());
         this.view.btnModify.click(() => this.modifyTable());
         this.view.btnSave.click(() => this.saveTable());
         this.view.btnCancel.click(() => this.cancelChanges());
@@ -276,10 +277,10 @@ class EmployeeController {
         this.clearEmployeeData();
         this.model.btnModifyStatus = BtnStatus.hidden;
         let data = {
-            searchType: this.model.searchType,
-            searchText: this.model.searchText
+            employeeNumber: this.model.searchEmployeeNumber,
+            name: this.model.searchName,
+            department: this.model.selectedDepartmentName
         }
-
         $.ajax({
             type: 'POST',
             url: '../Employee/SearchEmployees',
@@ -305,9 +306,18 @@ class EmployeeController {
         });
     }
 
+    addTable() {
+        if (this.model.employees && this.model.tableStatus === TableStatus.onlyDisplay) {
+            $.when(this.modifyTable())
+                .done(() => this.addTableRow());
+        } else {
+            this.addTableRow();
+        }
+    }
+
     addTableRow() {
         this.model.tableStatus = TableStatus.allowModify;
-        this.model.btnSearchStatus = BtnStatus.hidden;
+        this.model.btnSearchStatus = BtnStatus.disabled;
         this.model.btnModifyStatus = BtnStatus.hidden;
         this.model.btnSaveStatus = BtnStatus.display;
         this.model.btnCancelStatus = BtnStatus.display;
@@ -331,19 +341,20 @@ class EmployeeController {
             this.model.tempEmployees.push(tempEmployee);
 
             this.view.updateView();
-            this.bindTable();
-
+            this.bindElementEventOfTable();
         });
+
     }
 
     modifyTable() {
         this.model.tableStatus = TableStatus.allowModify;
-        this.model.btnSearchStatus = BtnStatus.hidden;
+        this.model.btnSearchStatus = BtnStatus.disabled;
         this.model.btnModifyStatus = BtnStatus.hidden;
         this.model.btnSaveStatus = BtnStatus.display;
         this.model.btnCancelStatus = BtnStatus.display;
 
         this.model.departments.length = 0;
+        let deferred = $.Deferred();
         $.ajax({
             type: 'POST',
             url: '../Employee/GetAllDepartments',
@@ -371,10 +382,10 @@ class EmployeeController {
             }
 
             this.view.updateView();
-            this.bindTable();
-
+            this.bindElementEventOfTable();
+            deferred.resolve();
         });
-
+        return deferred;
     }
 
     saveTable() {
@@ -436,7 +447,7 @@ class EmployeeController {
 
     }
 
-    bindTable() {
+    bindElementEventOfTable() {
         this.view.table.find('.delete').each((index, element) => $(element).click(() => {
             if (this.model.tempEmployees[index].status === TempEmployeeStatus.insert) {
                 this.model.tempEmployees.splice(index, 1);
@@ -450,7 +461,7 @@ class EmployeeController {
                 this.model.tempEmployees[index].status = TempEmployeeStatus.update;
             }
             this.view.updateView();
-            this.bindTable();
+            this.bindElementEventOfTable();
         }));
 
         this.view.table.find('.employeeNumber').each((index, element) => $(element).change((event) => {
@@ -523,5 +534,23 @@ class EmployeeController {
             }
         }
         return Data;
+    }
+
+    getDepartmentsForSearch() {
+        this.model.departments.length = 0;
+        $.ajax({
+            type: 'POST',
+            url: '../Employee/GetAllDepartments',
+            dataType: 'json'
+        }).done((departments) => {
+            if (Array.isArray(departments) && departments.length) {
+                for (const department of departments) {
+                    let temp = new Department(department.Name);
+
+                    this.model.departments.push(temp);
+                }
+            }
+            this.view.refreshDepartmentListOfSearch();
+        });
     }
 }

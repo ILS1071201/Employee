@@ -23,27 +23,21 @@ namespace EmployeeTable.Controllers
         }
 
         [HttpPost]
-        public ActionResult SearchEmployees(string searchType, string searchText)
+        public ActionResult SearchEmployees(string employeeNumber, string name, string department)
         {
-            var dt = new DataTable();
-            var SPCommand = string.Empty;
-            if (searchType == "employeeNumber")
-            {
-                SPCommand = "USP_Employee_S00";
-            }else if (searchType == "name")
-            {
-                SPCommand = "USP_Employee_S01";
-            }
-            else
+            if (employeeNumber == null || name == null || department == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
+            var dt = new DataTable();
             using (var con = new SqlConnection(_connectionString))
             {
-                var cmd = new SqlCommand(SPCommand, con);
+                var cmd = new SqlCommand("USP_Employee_S02", con);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add("@I_CHR_SearchText", SqlDbType.VarChar, 10).Value = searchText;
+                cmd.Parameters.Add("@I_CHR_EmployeeNumber", SqlDbType.VarChar, 10).Value = employeeNumber;
+                cmd.Parameters.Add("@I_CHR_Name", SqlDbType.NVarChar, 50).Value = name;
+                cmd.Parameters.Add("@I_CHR_Department", SqlDbType.NVarChar, 50).Value = department;
                 con.Open();
                 var reader = cmd.ExecuteReader();
                 dt.Load(reader);

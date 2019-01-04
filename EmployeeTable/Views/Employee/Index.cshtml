@@ -11,9 +11,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
     <style>
         form {
-            margin-top:10px;
+            margin-top: 5px;
+        }
+
+        .searchBox {
+            margin: 10px 0px;
+        }
+
+        button {
+            margin: 0px 3px;
         }
     </style>
     <title>Employee</title>
@@ -24,33 +33,42 @@
     <div class="container text-center">
         <h1>員工資料維護</h1>
         <hr>
-        <div class="d-flex justify-content-between">
-            <div class="input-group col-5">
-                <select class="custom-select col-3" id="searchType">
-                    <option value="employeeNumber" selected>員工編號</option>
-                    <option value="name">姓名</option>
-                </select>
-                <input type="text" class="form-control" placeholder="查詢員工編號" id="searchText" />
-                <div class="input-group-append">
-                    <button type="button" class="btn btn-outline-secondary" id="btnSearch">查詢</button>
+        <div class="d-flex justify-content-between searchBox">
+            <div class="input-group col-4">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">員工編號</div>
                 </div>
+                <input type="text" class="form-control" placeholder="查詢員工編號" id="textSearchEmployeeNumber" />
             </div>
-            <div class="">
-                <h5></h5>
+            <div class="input-group col-4">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">員工姓名</div>
+                </div>
+                <input type="text" class="form-control" placeholder="查詢員工性名" id="textSearchName" />
             </div>
-            <div class="">
-                <button type="button" class="btn btn-primary ml-md-auto d-none" id="btnAdd">新增</button>
-                <button type="button" class="btn btn-primary ml-md-auto d-none" id="btnModify">修改</button>
-                <button type="button" class="btn btn-primary ml-md-auto d-none" id="btnSave">保存</button>
-                <button type="button" class="btn btn-primary ml-md-auto d-none" id="btnCancel">取消</button>
+            <div class="input-group col-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" >部門</label>
+                </div>
+                <select class="custom-select" id="selectedDepartment">
+                    <option value="" selected>選擇部門...</option>
+                </select>
             </div>
+            <button type="button" class="btn btn-outline-secondary" id="btnSearch">查詢</button>
+        </div>
+        <hr />
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary d-none" id="btnAdd">新增</button>
+            <button type="button" class="btn btn-primary d-none" id="btnModify">修改</button>
+            <button type="button" class="btn btn-primary d-none" id="btnSave">保存</button>
+            <button type="button" class="btn btn-primary d-none" id="btnCancel">取消</button>
         </div>
         <form>
             <table class="table table-hover table-striped table-bordered">
                 <thead>
                     <tr>
-                        <th scope="col" style="width:5%">#</th>
-                        <th scope="col" style="width:19%">員工編號</th>
+                        <th scope="col" style="width:6%">#</th>
+                        <th scope="col" style="width:18%">員工編號</th>
                         <th scope="col" style="width:19%">姓名</th>
                         <th scope="col" style="width:19%">部門名稱</th>
                         <th scope="col" style="width:19%">職位</th>
